@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/cron/sync-etfs",
+      "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/cron/sync-holdings",
+      "schedule": "0 7 * * *"
+    }
+  ]
+}
