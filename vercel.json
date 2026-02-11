@@ -1,12 +1,20 @@
 {
   "crons": [
     {
+      "path": "/api/cron/sync-prices",
+      "schedule": "0 5 * * *"
+    },
+    {
       "path": "/api/cron/sync-etfs",
       "schedule": "0 6 * * *"
     },
     {
       "path": "/api/cron/sync-holdings",
       "schedule": "0 7 * * *"
+    },
+    {
+      "path": "/api/cron/sync-news",
+      "schedule": "0 */4 * * *"
     }
   ]
 }

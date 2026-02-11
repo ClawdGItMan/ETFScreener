@@ -72,8 +72,8 @@ const BLACKROCK_ETFS = [
   // === Thematic & Innovation ===
   "ARTY", "IDRV", "IHAK", "IDNA", "TECB", "ICOP", "ILIT",
 
-  // === Crypto ===
-  "IBIT", "ETHA",
+  // === Crypto (Bitcoin & Ethereum Spot ETFs) ===
+  "IBIT", "ETHA",  // BlackRock Bitcoin & Ethereum
 
   // === Active ETFs ===
   "BINC", "BLCV", "BLCR", "BGRO", "BRLN", "CLOA", "BRHY", "BRTR",
@@ -95,12 +95,26 @@ const BLACKROCK_ETFS = [
 ];
 
 const COMPETITOR_ETFS = [
+  // === Vanguard ===
   "VOO", "VTI", "VEA", "VWO", "BND", "VXUS", "VIG", "VYM", "VB", "VO",
   "VGT", "VHT", "VNQ", "VTV", "VUG",
+  // === State Street SPDR ===
   "SPY", "MDY", "DIA", "GLD", "XLF", "XLK", "XLE", "XLV", "XLI", "XLY",
   "XLP", "XLU", "XLB", "XLRE", "XLC",
+  // === Invesco ===
   "QQQ", "QQQM", "RSP",
+  // === Schwab ===
   "SCHD", "SCHX", "SCHB", "SCHA", "SCHF", "SCHE",
+  // === Crypto ETFs (Non-BlackRock) ===
+  "GBTC", "ETHE",   // Grayscale Bitcoin & Ethereum
+  "FBTC", "FETH",   // Fidelity Bitcoin & Ethereum
+  "ARKB",           // ARK 21Shares Bitcoin
+  "BITB",           // Bitwise Bitcoin
+  "HODL",           // VanEck Bitcoin
+  "BRRR",           // Valkyrie Bitcoin
+  "EZBC",           // Franklin Bitcoin
+  "BTCO",           // Invesco Galaxy Bitcoin
+  "BTCW",           // WisdomTree Bitcoin
 ];
 
 const FMP_BASE = "https://financialmodelingprep.com/stable";
