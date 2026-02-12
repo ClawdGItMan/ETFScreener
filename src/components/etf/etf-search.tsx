@@ -3,8 +3,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Search, TrendingUp, Layers, Building2 } from "lucide-react";
+import { Command as CommandPrimitive } from "cmdk";
 import {
-  CommandDialog,
   CommandInput,
   CommandList,
   CommandEmpty,
@@ -12,6 +12,13 @@ import {
   CommandItem,
   CommandSeparator,
 } from "@/components/ui/command";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { formatLargeNumber } from "@/lib/utils/format";
 
@@ -109,13 +116,19 @@ export function EtfSearch() {
         </kbd>
       </Button>
 
-      <CommandDialog open={open} onOpenChange={setOpen}>
-        <CommandInput
-          placeholder="Search by ticker, name, sector, stock holding..."
-          value={query}
-          onValueChange={setQuery}
-        />
-        <CommandList>
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogHeader className="sr-only">
+          <DialogTitle>Search ETFs</DialogTitle>
+          <DialogDescription>Search by ticker, name, sector, or stock holding</DialogDescription>
+        </DialogHeader>
+        <DialogContent className="overflow-hidden p-0" showCloseButton={false}>
+          <CommandPrimitive shouldFilter={false} className="[&_[cmdk-group-heading]]:text-muted-foreground **:data-[slot=command-input-wrapper]:h-12 [&_[cmdk-group-heading]]:px-2 [&_[cmdk-group-heading]]:font-medium [&_[cmdk-group]]:px-2 [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 [&_[cmdk-input]]:h-12 [&_[cmdk-item]]:px-2 [&_[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5 bg-popover text-popover-foreground flex h-full w-full flex-col overflow-hidden rounded-md">
+            <CommandInput
+              placeholder="Search by ticker, name, sector, stock holding..."
+              value={query}
+              onValueChange={setQuery}
+            />
+            <CommandList>
           <CommandEmpty>
             {loading ? (
               "Searching..."
@@ -229,8 +242,10 @@ export function EtfSearch() {
               </ul>
             </div>
           )}
-        </CommandList>
-      </CommandDialog>
+            </CommandList>
+          </CommandPrimitive>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
