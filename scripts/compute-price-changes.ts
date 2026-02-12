@@ -70,6 +70,7 @@ async function main() {
 
     await sql`
       UPDATE etfs SET
+        price = ${currentPrice.toFixed(4)},
         price_change_1w = ${change1w},
         price_change_1m = ${change1m},
         price_change_3m = ${change3m},
