@@ -118,3 +118,36 @@ export async function getHoldingsSnapshots(
     .where(and(...conditions))
     .orderBy(desc(holdingsSnapshots.snapshotDate));
 }
+
+/**
+ * Find ETFs that hold a specific stock/security
+ */
+export async function findEtfsByHolding(stockQuery: string, limit: number = 10) {
+  // Import etfs table for the join
+  const { etfs } = await import("@/lib/db/schema");
+
+  return db
+    .select({
+      etfTicker: holdings.etfTicker,
+      etfName: etfs.name,
+      etfIssuer: etfs.issuer,
+      etfCategory: etfs.category,
+      etfAum: etfs.aum,
+      securityTicker: holdings.securityTicker,
+      securityName: holdings.securityName,
+      weight: holdings.weight,
+    })
+    .from(holdings)
+    .innerJoin(etfs, eq(holdings.etfTicker, etfs.ticker))
+    .where(
+      and(
+        isNotNull(holdings.weight),
+        or(
+          ilike(holdings.securityTicker, `%${stockQuery}%`),
+          ilike(holdings.securityName, `%${stockQuery}%`)
+        )
+      )
+    )
+    .orderBy(desc(holdings.weight))
+    .limit(limit);
+}

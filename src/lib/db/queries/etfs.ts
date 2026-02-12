@@ -118,6 +118,114 @@ export async function searchEtfs(query: string) {
     .limit(10);
 }
 
+/**
+ * Enhanced search that also matches on category, issuer, asset class, and index
+ */
+export async function searchEtfsEnhanced(query: string) {
+  const normalizedQuery = query.toLowerCase().trim();
+
+  // Check for common keyword mappings
+  const keywordMappings: Record<string, { field: "category" | "issuer" | "assetClass"; values: string[] }> = {
+    // Asset classes
+    "equity": { field: "assetClass", values: ["Equity"] },
+    "stock": { field: "assetClass", values: ["Equity"] },
+    "stocks": { field: "assetClass", values: ["Equity"] },
+    "bond": { field: "assetClass", values: ["Fixed Income"] },
+    "bonds": { field: "assetClass", values: ["Fixed Income"] },
+    "fixed income": { field: "assetClass", values: ["Fixed Income"] },
+    "commodity": { field: "assetClass", values: ["Commodity"] },
+    "commodities": { field: "assetClass", values: ["Commodity"] },
+    "crypto": { field: "category", values: ["Digital Assets"] },
+    "bitcoin": { field: "category", values: ["Digital Assets"] },
+    "ethereum": { field: "category", values: ["Digital Assets"] },
+    "digital assets": { field: "category", values: ["Digital Assets"] },
+    // Categories
+    "tech": { field: "category", values: ["Technology"] },
+    "technology": { field: "category", values: ["Technology"] },
+    "healthcare": { field: "category", values: ["Health & Biotech"] },
+    "health": { field: "category", values: ["Health & Biotech"] },
+    "biotech": { field: "category", values: ["Health & Biotech"] },
+    "energy": { field: "category", values: ["Energy"] },
+    "financial": { field: "category", values: ["Financials"] },
+    "financials": { field: "category", values: ["Financials"] },
+    "real estate": { field: "category", values: ["Real Estate"] },
+    "reit": { field: "category", values: ["Real Estate"] },
+    "growth": { field: "category", values: ["Growth"] },
+    "value": { field: "category", values: ["Value"] },
+    "dividend": { field: "category", values: ["Dividend"] },
+    "dividends": { field: "category", values: ["Dividend"] },
+    "emerging": { field: "category", values: ["Emerging Markets"] },
+    "emerging markets": { field: "category", values: ["Emerging Markets"] },
+    "international": { field: "category", values: ["International Equity", "International Developed Markets"] },
+    "esg": { field: "category", values: ["ESG"] },
+    "sustainable": { field: "category", values: ["ESG"] },
+    "small cap": { field: "category", values: ["Small-Cap"] },
+    "mid cap": { field: "category", values: ["Mid-Cap"] },
+    "large cap": { field: "category", values: ["Large-Cap"] },
+    // Issuers
+    "blackrock": { field: "issuer", values: ["BlackRock"] },
+    "ishares": { field: "issuer", values: ["BlackRock"] },
+    "vanguard": { field: "issuer", values: ["Vanguard"] },
+    "state street": { field: "issuer", values: ["State Street"] },
+    "spdr": { field: "issuer", values: ["State Street"] },
+    "invesco": { field: "issuer", values: ["Invesco"] },
+    "fidelity": { field: "issuer", values: ["Fidelity"] },
+    "schwab": { field: "issuer", values: ["Schwab"] },
+  };
+
+  // Check if query matches any keyword
+  const mapping = keywordMappings[normalizedQuery];
+
+  // Build conditions for direct search
+  const directConditions = or(
+    ilike(etfs.ticker, `%${query}%`),
+    ilike(etfs.name, `%${query}%`),
+    ilike(etfs.category, `%${query}%`),
+    ilike(etfs.assetClass, `%${query}%`),
+    ilike(etfs.indexTracked, `%${query}%`)
+  );
+
+  // If we have a keyword mapping, prioritize that
+  if (mapping) {
+    const keywordConditions = mapping.values.map((v) => {
+      if (mapping.field === "category") return eq(etfs.category, v);
+      if (mapping.field === "issuer") return eq(etfs.issuer, v);
+      return eq(etfs.assetClass, v);
+    });
+
+    const keywordResults = await db
+      .select({
+        ticker: etfs.ticker,
+        name: etfs.name,
+        issuer: etfs.issuer,
+        category: etfs.category,
+        aum: etfs.aum,
+        matchType: sql<string>`'keyword'`.as("match_type"),
+      })
+      .from(etfs)
+      .where(or(...keywordConditions))
+      .orderBy(desc(etfs.aum))
+      .limit(15);
+
+    return keywordResults;
+  }
+
+  // Otherwise do direct matching
+  return db
+    .select({
+      ticker: etfs.ticker,
+      name: etfs.name,
+      issuer: etfs.issuer,
+      category: etfs.category,
+      aum: etfs.aum,
+      matchType: sql<string>`'direct'`.as("match_type"),
+    })
+    .from(etfs)
+    .where(directConditions)
+    .orderBy(desc(etfs.aum))
+    .limit(15);
+}
+
 export async function getCategories() {
   const result = await db
     .selectDistinct({ category: etfs.category })
